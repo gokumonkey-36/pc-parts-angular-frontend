@@ -1,0 +1,166 @@
+<header class="topbar">
+  <div>
+    <h1>PC Parts Store</h1>
+    <p>Simple frontend for your Django product and order services.</p>
+  </div>
+  <div class="session">
+    <span>Session</span>
+    <strong>{{ sessionId }}</strong>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="content">
+    <div class="notice success" *ngIf="message">{{ message }}</div>
+    <div class="notice error" *ngIf="error">{{ error }}</div>
+
+    <section class="panel" *ngIf="featuredProducts.length">
+      <div class="section-head">
+        <h2>Featured Products</h2>
+      </div>
+      <div class="featured-grid">
+        <article class="featured" *ngFor="let product of featuredProducts">
+          <div>
+            <strong>{{ product.name }}</strong>
+            <span>{{ product.brand || product.category_name }}</span>
+          </div>
+          <button type="button" (click)="addProduct(product)" [disabled]="product.stock === 0">Add</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <h2>Products</h2>
+        <span *ngIf="loading">Loading...</span>
+      </div>
+
+      <form class="filters" [formGroup]="filtersForm" (ngSubmit)="loadProducts()">
+        <input type="search" placeholder="Search products" formControlName="search">
+        <select formControlName="category">
+          <option value="">All categories</option>
+          <option *ngFor="let category of categories" [value]="category.slug">{{ category.name }}</option>
+        </select>
+        <input type="text" placeholder="Brand" formControlName="brand">
+        <input type="number" min="0" placeholder="Min price" formControlName="min_price">
+        <input type="number" min="0" placeholder="Max price" formControlName="max_price">
+        <select formControlName="ordering">
+          <option value="-created_at">Newest</option>
+          <option value="name">Name A-Z</option>
+          <option value="price">Price low to high</option>
+          <option value="-price">Price high to low</option>
+        </select>
+        <button type="submit">Apply</button>
+        <button type="button" class="secondary" (click)="resetFilters()">Reset</button>
+      </form>
+
+      <div class="product-grid">
+        <article class="product-card" *ngFor="let product of products">
+          <div class="image" *ngIf="imageUrl(product); else noImage">
+            <img [src]="imageUrl(product)" [alt]="product.name">
+          </div>
+          <ng-template #noImage>
+            <div class="image placeholder">No image</div>
+          </ng-template>
+
+          <div class="product-body">
+            <div>
+              <h3>{{ product.name }}</h3>
+              <p>{{ product.description }}</p>
+            </div>
+            <dl>
+              <div>
+                <dt>Brand</dt>
+                <dd>{{ product.brand || 'N/A' }}</dd>
+              </div>
+              <div>
+                <dt>Category</dt>
+                <dd>{{ product.category_name }}</dd>
+              </div>
+              <div>
+                <dt>Stock</dt>
+                <dd>{{ product.stock }}</dd>
+              </div>
+            </dl>
+            <div class="product-actions">
+              <strong>{{ +product.price | currency:'INR':'symbol':'1.0-2' }}</strong>
+              <button type="button" (click)="addProduct(product)" [disabled]="product.stock === 0 || cartLoading">
+                {{ product.stock === 0 ? 'Out of stock' : 'Add to cart' }}
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <p class="empty" *ngIf="!loading && !products.length">No products found.</p>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <h2>Your Orders</h2>
+        <button type="button" class="secondary" (click)="loadOrders()">Refresh</button>
+      </div>
+
+      <div class="order" *ngFor="let order of orders">
+        <div>
+          <strong>Order #{{ order.id }}</strong>
+          <span>{{ order.created_at | date:'medium' }}</span>
+        </div>
+        <span class="status">{{ order.status }}</span>
+        <strong>{{ +order.total_amount | currency:'INR':'symbol':'1.0-2' }}</strong>
+      </div>
+
+      <p class="empty" *ngIf="!orders.length">No orders for this session yet.</p>
+    </section>
+  </section>
+
+  <aside class="sidebar">
+    <section class="panel">
+      <div class="section-head">
+        <h2>Cart</h2>
+        <button type="button" class="secondary" (click)="clearCart()" [disabled]="!cart?.items?.length">Clear</button>
+      </div>
+
+      <div class="cart-item" *ngFor="let item of cart?.items">
+        <div>
+          <strong>{{ item.product_name }}</strong>
+          <span>{{ item.quantity }} x {{ +item.product_price | currency:'INR':'symbol':'1.0-2' }}</span>
+        </div>
+        <div>
+          <strong>{{ +item.subtotal | currency:'INR':'symbol':'1.0-2' }}</strong>
+          <button type="button" class="link" (click)="removeItem(item.id)">Remove</button>
+        </div>
+      </div>
+
+      <p class="empty" *ngIf="!cart?.items?.length">Cart is empty.</p>
+
+      <div class="total">
+        <span>Total</span>
+        <strong>{{ +(cart?.total || 0) | currency:'INR':'symbol':'1.0-2' }}</strong>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Checkout</h2>
+      <form class="checkout" [formGroup]="checkoutForm" (ngSubmit)="submitCheckout()">
+        <label>
+          Name
+          <input type="text" formControlName="customer_name">
+        </label>
+        <label>
+          Email
+          <input type="email" formControlName="customer_email">
+        </label>
+        <label>
+          Shipping address
+          <textarea rows="4" formControlName="shipping_address"></textarea>
+        </label>
+        <label>
+          Phone
+          <input type="tel" formControlName="phone">
+        </label>
+        <button type="submit" [disabled]="!cart?.items?.length">Place order</button>
+      </form>
+    </section>
+  </aside>
+</main>
