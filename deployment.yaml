@@ -27,7 +27,7 @@ spec:
         app: pc-frontend-service
     spec:
       containers:
-      - image: gokumonkey/pc-frontend-service:2
+      - image: gokumonkey/pc-frontend-service:3
         name: pc-frontend-microservice
         imagePullPolicy: Always
         ports:
