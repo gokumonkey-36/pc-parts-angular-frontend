@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: pc-frontend-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: pc-frontend-service
@@ -27,7 +27,7 @@ spec:
         app: pc-frontend-service
     spec:
       containers:
-      - image: gokumonkey/pc-frontend-service:1
+      - image: gokumonkey/pc-frontend-service:2
         name: pc-frontend-microservice
         imagePullPolicy: Always
         ports:
