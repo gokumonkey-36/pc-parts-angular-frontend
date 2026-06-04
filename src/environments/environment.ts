@@ -3,6 +3,6 @@
 //   orderApiUrl: 'http://localhost:8002/api/orders'
 // };
 export const environment = {
-  productApiUrl: '/product',
-  orderApiUrl: '/order'
+   productApiUrl: '/api/products',
+  orderApiUrl: '/api/orders'
 };
