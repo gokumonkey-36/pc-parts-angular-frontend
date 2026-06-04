@@ -23,9 +23,9 @@ pipeline {
         stage('Build image') {
             steps {
                 sh '''
-                docker build -t ${DOCKER_USER}/${IMAGE_NAME}:3 .
+                docker build -t ${DOCKER_USER}/${IMAGE_NAME}:7 .
                 docker login -u ${DOCKER_USER} -p ${TOKEN}
-                docker push ${DOCKER_USER}/${IMAGE_NAME}:3
+                docker push ${DOCKER_USER}/${IMAGE_NAME}:7
                 '''
             }
         }
