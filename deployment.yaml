@@ -6,7 +6,7 @@ spec:
   type: ClusterIP
   ports:
   - port: 80
-    targetPort: 4200
+    targetPort: 80
   selector:
     app: pc-frontend-service
 
@@ -31,4 +31,4 @@ spec:
         name: pc-frontend-microservice
         imagePullPolicy: Always
         ports:
-        - containerPort: 4200
+        - containerPort: 80
